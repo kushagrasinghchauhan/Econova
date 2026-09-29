@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EcoNova — My Contributions History</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body style="background: var(--eco-bg); min-height: 100vh;">
+
+  <!-- Minimal Top Nav -->
+  <nav class="navbar" style="justify-content: center; padding: 0.85rem 1.5rem;">
+    <a href="/dashboard" class="nav-brand">
+      <div class="nav-brand-icon">🌿</div>
+      <span>EcoNova</span>
+      <span class="nav-brand-tagline">My Contributions</span>
+    </a>
+  </nav>
+
+  <!-- Reusable Botanical Leaf Framing SVGs -->
+  <svg class="leaf-frame leaf-top-left" viewBox="0 0 160 160" fill="none">
+    <path d="M-20 -20 C35 15 80 65 65 125 C60 145 35 155 15 160" stroke="#155e3a" stroke-width="2.5" opacity="0.35"/>
+    <path d="M15 20 C45 10 70 30 65 60 C50 55 35 40 15 20 Z" fill="#1b6d45" opacity="0.3"/>
+    <path d="M45 60 C80 50 105 75 95 110 C80 100 65 85 45 60 Z" fill="#16a34a" opacity="0.25"/>
+  </svg>
+
+  <svg class="leaf-frame leaf-top-right" viewBox="0 0 160 160" fill="none" style="transform: scaleX(-1);">
+    <path d="M-20 -20 C35 15 80 65 65 125 C60 145 35 155 15 160" stroke="#155e3a" stroke-width="2.5" opacity="0.35"/>
+    <path d="M15 20 C45 10 70 30 65 60 C50 55 35 40 15 20 Z" fill="#1b6d45" opacity="0.3"/>
+    <path d="M45 60 C80 50 105 75 95 110 C80 100 65 85 45 60 Z" fill="#16a34a" opacity="0.25"/>
+  </svg>
+
+  <!-- ==========================================================================
+       SCREEN 9: HISTORY (MOBILE PORTRAIT)
+       ========================================================================== -->
+  <main class="mobile-history-screen">
+    <div class="mobile-history-card">
+      
+      <!-- Top Header: Back Arrow + My Contributions -->
+      <div class="history-top-header">
+        <a href="/dashboard" class="history-back-btn" title="Back to Dashboard">←</a>
+        <h1 class="history-header-title">My Contributions</h1>
+      </div>
+
+      <!-- Filter Chips: All, Plastic, Organic, Metal -->
+      <div class="history-filter-chips">
+        <button class="filter-chip-btn active" id="chip-all" onclick="setFilter('All')">All</button>
+        <button class="filter-chip-btn" id="chip-plastic" onclick="setFilter('Plastic')">Plastic</button>
+        <button class="filter-chip-btn" id="chip-organic" onclick="setFilter('Organic')">Organic</button>
+        <button class="filter-chip-btn" id="chip-metal" onclick="setFilter('Metal')">Metal</button>
+      </div>
+
+      <!-- List of Recycling History Cards -->
+      <div class="history-items-container" id="history-items-list">
+        <!-- Sample/Initial items matching reference while database loads -->
+        <div class="history-item-entry">
+          <div class="history-item-left">
+            <div class="history-item-icon">🧴</div>
+            <div>
+              <div class="history-item-name">Plastic Bottle</div>
+              <div class="history-item-points">+5 points</div>
+            </div>
+          </div>
+          <div class="history-item-right">
+            <span class="history-item-date">23 Sep, 10:24 AM</span>
+            <span class="history-chevron">›</span>
+          </div>
+        </div>
+
+        <div class="history-item-entry">
+          <div class="history-item-left">
+            <div class="history-item-icon">🥫</div>
+            <div>
+              <div class="history-item-name">Aluminium Can</div>
+              <div class="history-item-points">+5 points</div>
+            </div>
+          </div>
+          <div class="history-item-right">
+            <span class="history-item-date">21 Sep, 05:12 PM</span>
+            <span class="history-chevron">›</span>
+          </div>
+        </div>
+
+        <div class="history-item-entry">
+          <div class="history-item-left">
+            <div class="history-item-icon">🍌</div>
+            <div>
+              <div class="history-item-name">Food Waste</div>
+              <div class="history-item-points">+5 points</div>
+            </div>
+          </div>
+          <div class="history-item-right">
+            <span class="history-item-date">20 Sep, 11:05 AM</span>
+            <span class="history-chevron">›</span>
+          </div>
+        </div>
+
+        <div class="history-item-entry">
+          <div class="history-item-left">
+            <div class="history-item-icon">🍫</div>
+            <div>
+              <div class="history-item-name">Plastic Wrapper</div>
+              <div class="history-item-points">+5 points</div>
+            </div>
+          </div>
+          <div class="history-item-right">
+            <span class="history-item-date">19 Sep, 04:33 PM</span>
+            <span class="history-chevron">›</span>
+          </div>
+        </div>
+
+        <div class="history-item-entry">
+          <div class="history-item-left">
+            <div class="history-item-icon">🥄</div>
+            <div>
+              <div class="history-item-name">Metal Spoon</div>
+              <div class="history-item-points">+5 points</div>
+            </div>
+          </div>
+          <div class="history-item-right">
+            <span class="history-item-date">18 Sep, 09:41 AM</span>
+            <span class="history-chevron">›</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    let rawRewards = [];
+    let currentCategory = "All";
+
+    const ICON_CAT_MAP = {
+      Plastic: "🧴",
+      Organic: "🍌",
+      Metal: "🥫"
+    };
+
+    const NAME_CAT_MAP = {
+      Plastic: "Plastic Bottle",
+      Organic: "Food Waste",
+      Metal: "Aluminium Can"
+    };
+
+    async function loadHistory() {
+      const storedUserId = localStorage.getItem("econova_user_id");
+      try {
+        const url = storedUserId ? `/api/dashboard/summary?user_id=${storedUserId}` : `/api/dashboard/summary`;
+        const res = await fetch(url);
+        if (!res.ok) return;
+
+        const data = await res.json();
+        rawRewards = (data.user_rewards && data.user_rewards.length > 0) ? data.user_rewards : (data.recent_rewards || []);
+        
+        if (rawRewards.length > 0) {
+          renderList();
+        }
+      } catch (e) {
+        console.warn("History fetch error:", e);
+      }
+    }
+
+    function setFilter(cat) {
+      currentCategory = cat;
+      ["all", "plastic", "organic", "metal"].forEach(c => {
+        const btn = document.getElementById(`chip-${c}`);
+        if (btn) btn.classList.toggle("active", c === cat.toLowerCase());
+      });
+      renderList();
+    }
+
+    function renderList() {
+      const listEl = document.getElementById("history-items-list");
+      if (!listEl) return;
+
+      const filtered = rawRewards.filter(r => {
+        if (currentCategory === "All") return true;
+        return r.category && r.category.toLowerCase() === currentCategory.toLowerCase();
+      });
+
+      if (filtered.length === 0) {
+        listEl.innerHTML = `<div style="text-align:center; padding:2.5rem 1rem; color:var(--text-muted); font-size:0.95rem;">No contributions recorded for ${currentCategory}.</div>`;
+        return;
+      }
+
+      listEl.innerHTML = "";
+      filtered.forEach(r => {
+        const entry = document.createElement("div");
+        entry.className = "history-item-entry";
+        const icon = ICON_CAT_MAP[r.category] || "♻";
+        const name = NAME_CAT_MAP[r.category] || (r.category + " Waste");
+        const dateStr = (r.claimed_at || r.created_at || "Just now").replace("T", " ").substring(0, 16);
+
+        entry.innerHTML = `
+          <div class="history-item-left">
+            <div class="history-item-icon">${icon}</div>
+            <div>
+              <div class="history-item-name">${name}</div>
+              <div class="history-item-points">+${r.points || 5} points</div>
+            </div>
+          </div>
+          <div class="history-item-right">
+            <span class="history-item-date">${dateStr}</span>
+            <a href="/redeem/${r.reward_id}" class="history-chevron" style="text-decoration:none;">›</a>
+          </div>
+        `;
+        listEl.appendChild(entry);
+      });
+    }
+
+    window.addEventListener("DOMContentLoaded", loadHistory);
+  </script>
+</body>
+</html>

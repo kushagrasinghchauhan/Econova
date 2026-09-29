@@ -1,0 +1,49 @@
+# ==============================================================================
+# EcoNova - Git Ignore Configuration
+# ==============================================================================
+
+# Python bytecode & cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# Environment files & secrets
+.env
+.env.*
+!.env.example
+
+# Large datasets & local training checkpoints (avoids GitHub 100MB file limit)
+training/
+runs/
+New folder/
+yolov8n.pt
+yolo11n.pt
+weights/
+
+# Note: ai/models/yolo_3class_best.pt (~5.47 MB) IS required for deployment and MUST be tracked!
+!ai/models/yolo_3class_best.pt
+
+# Local SQLite databases (created automatically on startup)
+database/*.db
+database/*.sqlite*
+!database/.gitkeep
+
+# Generated reward QR images (created dynamically at runtime)
+rewards/*.png
+!rewards/.gitkeep
+
+# Editor & OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log

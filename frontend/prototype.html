@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>EcoNova — Prototype Camera (Phone 1)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #090d16;
+      --card-bg: rgba(15, 23, 42, 0.85);
+      --accent-green: #22c55e;
+      --accent-green-glow: rgba(34, 197, 94, 0.4);
+      --accent-blue: #38bdf8;
+      --accent-amber: #f59e0b;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .proto-app-wrapper {
+      width: 100%;
+      max-width: 480px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      padding: 0.85rem;
+    }
+
+    /* Top Header */
+    .proto-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.5rem 0.25rem 0.85rem 0.25rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      margin-bottom: 0.75rem;
+    }
+
+    .proto-brand-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .proto-logo {
+      font-size: 1.6rem;
+    }
+
+    .proto-titles {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .proto-title {
+      font-size: 1.25rem;
+      font-weight: 900;
+      letter-spacing: -0.3px;
+      color: #ffffff;
+    }
+
+    .proto-sub {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--accent-green);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .badge-mounted {
+      background: rgba(34, 197, 94, 0.15);
+      border: 1px solid rgba(34, 197, 94, 0.4);
+      color: var(--accent-green);
+      font-size: 0.72rem;
+      font-weight: 800;
+      padding: 0.25rem 0.65rem;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent-green);
+      box-shadow: 0 0 8px var(--accent-green);
+      animation: pulse 1.6s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+
+    /* Telemetry / Status Pill Row */
+    .telemetry-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.5rem;
+      margin-bottom: 0.85rem;
+    }
+
+    .telemetry-pill {
+      background: rgba(30, 41, 59, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 0.5rem 0.4rem;
+      text-align: center;
+    }
+
+    .telem-label {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .telem-val {
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin-top: 0.15rem;
+    }
+
+    .telem-val.online { color: var(--accent-green); }
+    .telem-val.ready { color: var(--accent-blue); }
+
+    /* Camera Viewport */
+    .camera-chamber-card {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 4/5;
+      background: #020617;
+      border-radius: 20px;
+      overflow: hidden;
+      border: 2px solid rgba(34, 197, 94, 0.35);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(34, 197, 94, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 0.85rem;
+    }
+
+    #webcam-video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Chamber HUD Overlays */
+    .chamber-corner {
+      position: absolute;
+      width: 32px;
+      height: 32px;
+      border-color: var(--accent-green);
+      border-style: solid;
+      border-width: 0;
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    .c-tl { top: 12px; left: 12px; border-top-width: 4px; border-left-width: 4px; border-top-left-radius: 12px; }
+    .c-tr { top: 12px; right: 12px; border-top-width: 4px; border-right-width: 4px; border-top-right-radius: 12px; }
+    .c-bl { bottom: 12px; left: 12px; border-bottom-width: 4px; border-left-width: 4px; border-bottom-left-radius: 12px; }
+    .c-br { bottom: 12px; right: 12px; border-bottom-width: 4px; border-right-width: 4px; border-bottom-right-radius: 12px; }
+
+    /* Reticle Laser Scan Line */
+    .laser-line {
+      position: absolute;
+      left: 8%;
+      width: 84%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent-green), transparent);
+      box-shadow: 0 0 8px var(--accent-green);
+      animation: laserSweep 2s ease-in-out infinite alternate;
+      pointer-events: none;
+      z-index: 4;
+    }
+
+    @keyframes laserSweep {
+      0% { top: 12%; }
+      100% { top: 88%; }
+    }
+
+    /* Live Detection Tag */
+    .detection-hud-tag {
+      position: absolute;
+      top: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.9);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--accent-green);
+      padding: 0.4rem 0.9rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: #ffffff;
+      display: none;
+      align-items: center;
+      gap: 0.45rem;
+      z-index: 6;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Start / Play Overlay */
+    .camera-play-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(9, 13, 22, 0.92);
+      backdrop-filter: blur(6px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      padding: 1.5rem;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .btn-camera-activate {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #15803d, #22c55e);
+      border: 3px solid #86efac;
+      box-shadow: 0 0 30px var(--accent-green-glow);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      color: #ffffff;
+      margin-bottom: 1rem;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .btn-camera-activate:active {
+      transform: scale(0.95);
+    }
+
+    .play-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 0.35rem;
+    }
+
+    .play-sub {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+      max-width: 280px;
+    }
+
+    /* Detection & Status Information Card */
+    .status-panel-card {
+      background: var(--card-bg);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 18px;
+      padding: 1rem 1.15rem;
+      backdrop-filter: blur(10px);
+      margin-bottom: 0.75rem;
+    }
+
+    .panel-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.75rem;
+    }
+
+    .panel-title {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .detection-result-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.65rem;
+    }
+
+    .result-category-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .result-cat-icon {
+      font-size: 1.85rem;
+    }
+
+    .result-cat-name {
+      font-size: 1.4rem;
+      font-weight: 900;
+      color: #ffffff;
+      letter-spacing: -0.3px;
+    }
+
+    .result-conf-badge {
+      background: rgba(34, 197, 94, 0.15);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      color: var(--accent-green);
+      font-size: 1rem;
+      font-weight: 800;
+      padding: 0.35rem 0.75rem;
+      border-radius: 12px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Confidence Progress Bar */
+    .conf-bar-track {
+      width: 100%;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 0.75rem;
+    }
+
+    .conf-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #16a34a, #22c55e);
+      border-radius: 999px;
+      transition: width 0.2s ease;
+    }
+
+    /* Stability Counter */
+    .stability-dots-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(15, 23, 42, 0.6);
+      padding: 0.6rem 0.85rem;
+      border-radius: 12px;
+      font-size: 0.8rem;
+    }
+
+    .stab-label {
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .stab-steps {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .stab-step {
+      width: 18px;
+      height: 6px;
+      border-radius: 3px;
+      background: rgba(255, 255, 255, 0.15);
+      transition: background 0.2s;
+    }
+
+    .stab-step.active {
+      background: var(--accent-green);
+      box-shadow: 0 0 6px var(--accent-green);
+    }
+
+    /* Bottom Architecture Banner */
+    .proto-footer-notice {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: auto;
+      padding: 0.5rem;
+      line-height: 1.4;
+    }
+
+    .proto-footer-notice strong {
+      color: #ffffff;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="proto-app-wrapper">
+
+    <!-- Header -->
+    <header class="proto-header">
+      <div class="proto-brand-group">
+        <span class="proto-logo">♻</span>
+        <div class="proto-titles">
+          <span class="proto-title">ECOnova</span>
+          <span class="proto-sub">PROTOTYPE CAMERA</span>
+        </div>
+      </div>
+      <div class="badge-mounted">
+        <span class="pulse-dot"></span>
+        <span>ONLINE</span>
+      </div>
+    </header>
+
+    <!-- Telemetry Row -->
+    <div class="telemetry-row">
+      <div class="telemetry-pill">
+        <div class="telem-label">Camera</div>
+        <div class="telem-val online" id="status-cam-val">ACTIVE</div>
+      </div>
+      <div class="telemetry-pill">
+        <div class="telem-label">Connection</div>
+        <div class="telem-val online">CONNECTED</div>
+      </div>
+      <div class="telemetry-pill">
+        <div class="telem-label">Status</div>
+        <div class="telem-val ready" id="status-ai-val">READY</div>
+      </div>
+    </div>
+
+    <!-- Camera Viewport (Chamber) -->
+    <div class="camera-chamber-card" id="chamber-container" onclick="startCameraManual(event)">
+      <video id="webcam-video" playsinline autoplay muted></video>
+      <canvas id="hidden-capture-canvas" style="display:none;"></canvas>
+
+      <!-- Laser Reticle Corners -->
+      <div class="chamber-corner c-tl"></div>
+      <div class="chamber-corner c-tr"></div>
+      <div class="chamber-corner c-bl"></div>
+      <div class="chamber-corner c-br"></div>
+      <div class="laser-line"></div>
+
+      <!-- Tag HUD -->
+      <div class="detection-hud-tag" id="hud-tag">
+        <span id="hud-tag-icon">🧴</span>
+        <span id="hud-tag-text">Plastic 91%</span>
+      </div>
+
+      <!-- Play Overlay (If autoplay requires initial tap) -->
+      <div class="camera-play-overlay" id="play-overlay">
+        <div class="btn-camera-activate">▶</div>
+        <div class="play-title">Start Prototype Camera</div>
+        <div class="play-sub">Tap anywhere to initialize rear camera stream for waste detection</div>
+      </div>
+    </div>
+
+    <!-- Latest Detection & Stabilization Panel -->
+    <div class="status-panel-card">
+      <div class="panel-header-row">
+        <span class="panel-title">Latest Detection</span>
+        <span style="font-size:0.75rem; color:var(--text-muted);" id="frame-counter-label">Frames sent: 0</span>
+      </div>
+
+      <div class="detection-result-row">
+        <div class="result-category-wrap">
+          <span class="result-cat-icon" id="cat-icon">🔍</span>
+          <span class="result-cat-name" id="cat-name">Awaiting Waste</span>
+        </div>
+        <div class="result-conf-badge" id="conf-badge">0.0%</div>
+      </div>
+
+      <!-- Confidence Bar -->
+      <div class="conf-bar-track">
+        <div class="conf-bar-fill" id="conf-bar"></div>
+      </div>
+
+      <!-- 3-Frame Stability Indicator -->
+      <div class="stability-dots-row">
+        <span class="stab-label" id="stab-label">Stability Accumulation:</span>
+        <div class="stab-steps">
+          <div class="stab-step" id="stab-1"></div>
+          <div class="stab-step" id="stab-2"></div>
+          <div class="stab-step" id="stab-3"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Notice -->
+    <footer class="proto-footer-notice">
+      <strong>Phone 1: Fixed Prototype Camera</strong><br>
+      Continuously streams frames to laptop AI. Reward QR codes are scanned by <strong>Phone 2</strong>.
+    </footer>
+
+  </div>
+
+  <script>
+    // Constants
+    const CAPTURE_INTERVAL_MS = 250; // ~4 FPS capture rate
+    const CONFIDENCE_THRESHOLD = 0.70;
+    const STABLE_FRAMES_REQUIRED = 3;
+
+    // Runtime state
+    let cameraStream = null;
+    let cameraActive = false;
+    let isDetecting = false;
+    let framesSentCount = 0;
+    let consecutiveCount = 0;
+    let lastDetectedCategory = null;
+    let isSortingActive = false;
+
+    const CATEGORY_ICONS = {
+      Organic: "🍏",
+      Plastic: "🧴",
+      Metal: "🥫",
+      Paper: "📄"
+    };
+
+    // ===================================================================
+    // CAMERA INITIALIZATION (Rear Camera, Autoplay, WakeLock)
+    // ===================================================================
+    async function initPrototypeCamera() {
+      // 1. Acquire Screen WakeLock so screen never sleeps on prototype
+      requestWakeLock();
+
+      const video = document.getElementById("webcam-video");
+      const playOverlay = document.getElementById("play-overlay");
+
+      const constraints = {
+        video: {
+          facingMode: { ideal: "environment" },
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        },
+        audio: false
+      };
+
+      try {
+        cameraStream = await navigator.mediaDevices.getUserMedia(constraints);
+      } catch (err1) {
+        console.warn("Primary camera constraints failed, attempting fallback...", err1);
+        try {
+          cameraStream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: "environment" },
+            audio: false
+          });
+        } catch (err2) {
+          console.error("All getUserMedia attempts failed:", err2);
+          document.getElementById("status-cam-val").textContent = "FAILED";
+          document.getElementById("status-cam-val").className = "telem-val";
+          return;
+        }
+      }
+
+      video.srcObject = cameraStream;
+      video.setAttribute("autoplay", "");
+      video.setAttribute("playsinline", "");
+      video.setAttribute("muted", "");
+      video.muted = true;
+      video.playsInline = true;
+
+      const markReady = () => {
+        cameraActive = true;
+        if (playOverlay) playOverlay.style.display = "none";
+        document.getElementById("status-cam-val").textContent = "ACTIVE";
+        document.getElementById("status-cam-val").className = "telem-val online";
+        console.log("[Prototype Camera] Rear camera stream active");
+      };
+
+      video.onplaying = markReady;
+      video.onloadeddata = markReady;
+
+      try {
+        await video.play();
+        markReady();
+      } catch (playErr) {
+        console.warn("Autoplay gesture required, awaiting user tap:", playErr);
+        if (playOverlay) playOverlay.style.display = "flex";
+      }
+    }
+
+    function startCameraManual(event) {
+      if (!cameraActive) {
+        initPrototypeCamera();
+      }
+    }
+
+    async function requestWakeLock() {
+      try {
+        if ('wakeLock' in navigator) {
+          await navigator.wakeLock.request('screen');
+          console.log("[Prototype Camera] Screen WakeLock acquired");
+        }
+      } catch (e) {
+        console.warn("WakeLock not available:", e);
+      }
+    }
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") {
+        requestWakeLock();
+      }
+    });
+
+    // ===================================================================
+    // CONTINUOUS FRAME CAPTURE (~4 FPS) -> /api/detect
+    // ===================================================================
+    async function captureAndSendFrame() {
+      if (!cameraActive || isDetecting || isSortingActive) return;
+
+      const video = document.getElementById("webcam-video");
+      if (!video || video.readyState < 2 || !video.videoWidth || !video.videoHeight) return;
+
+      let canvas = document.getElementById("hidden-capture-canvas");
+      if (!canvas) return;
+
+      const vW = video.videoWidth;
+      const vH = video.videoHeight;
+      const targetW = 640;
+      const targetH = Math.round((vH / vW) * targetW);
+
+      if (canvas.width !== targetW || canvas.height !== targetH) {
+        canvas.width = targetW;
+        canvas.height = targetH;
+      }
+
+      const ctx = canvas.getContext("2d", { willReadFrequently: false });
+      ctx.drawImage(video, 0, 0, targetW, targetH);
+
+      const dataUrl = canvas.toDataURL("image/jpeg", 0.8);
+      isDetecting = true;
+
+      try {
+        const res = await fetch("/api/detect", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            image: dataUrl,
+            source: "prototype"
+          })
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          handleDetectResponse(data);
+          framesSentCount++;
+          document.getElementById("frame-counter-label").textContent = `Frames sent: ${framesSentCount}`;
+        }
+      } catch (err) {
+        console.warn("Frame transmission error:", err);
+      } finally {
+        isDetecting = false;
+      }
+    }
+
+    function handleDetectResponse(data) {
+      const hudTag = document.getElementById("hud-tag");
+      const hudIcon = document.getElementById("hud-tag-icon");
+      const hudText = document.getElementById("hud-tag-text");
+      const catIcon = document.getElementById("cat-icon");
+      const catName = document.getElementById("cat-name");
+      const confBadge = document.getElementById("conf-badge");
+      const confBar = document.getElementById("conf-bar");
+      const stabLabel = document.getElementById("stab-label");
+
+      // Case: Session locked (Laptop actively sorting or displaying QR)
+      if (data.session_locked) {
+        document.getElementById("status-ai-val").textContent = "SORTING/QR";
+        document.getElementById("status-ai-val").className = "telem-val";
+        catName.textContent = "Reward Display Active";
+        confBadge.textContent = "LOCKED";
+        confBar.style.width = "100%";
+        updateStabilityUI(0);
+        return;
+      }
+
+      document.getElementById("status-ai-val").textContent = "READY";
+      document.getElementById("status-ai-val").className = "telem-val ready";
+
+      // Case: No waste detected in frame
+      if (!data.detected) {
+        hudTag.style.display = "none";
+        catIcon.textContent = "🔍";
+        catName.textContent = "Scanning Chamber...";
+        confBadge.textContent = "0.0%";
+        confBar.style.width = "0%";
+        consecutiveCount = 0;
+        updateStabilityUI(0);
+        return;
+      }
+
+      // Case: Waste Detected!
+      const cat = data.category;
+      const confPct = (data.confidence * 100).toFixed(1);
+      const icon = CATEGORY_ICONS[cat] || "♻️";
+
+      hudTag.style.display = "inline-flex";
+      hudIcon.textContent = icon;
+      hudText.textContent = `${cat} ${confPct}%`;
+
+      catIcon.textContent = icon;
+      catName.textContent = cat;
+      confBadge.textContent = `${confPct}%`;
+      confBar.style.width = `${Math.min(100, data.confidence * 100)}%`;
+
+      // Stability Check (3 consecutive frames >= 70%)
+      if (data.is_confident && data.confidence >= CONFIDENCE_THRESHOLD) {
+        if (cat === lastDetectedCategory) {
+          consecutiveCount++;
+        } else {
+          lastDetectedCategory = cat;
+          consecutiveCount = 1;
+        }
+
+        updateStabilityUI(consecutiveCount);
+
+        if (consecutiveCount >= STABLE_FRAMES_REQUIRED && !isSortingActive) {
+          console.log(`[Prototype Camera] Stable waste confirmed: ${cat} (${confPct}%)!`);
+          consecutiveCount = 0;
+          triggerSortSequence(cat, data.confidence);
+        }
+      } else {
+        consecutiveCount = 0;
+        updateStabilityUI(0);
+      }
+    }
+
+    function updateStabilityUI(count) {
+      document.getElementById("stab-1").className = count >= 1 ? "stab-step active" : "stab-step";
+      document.getElementById("stab-2").className = count >= 2 ? "stab-step active" : "stab-step";
+      document.getElementById("stab-3").className = count >= 3 ? "stab-step active" : "stab-step";
+    }
+
+    async function triggerSortSequence(category, confidence) {
+      isSortingActive = true;
+      document.getElementById("status-ai-val").textContent = "SORTING";
+      document.getElementById("status-ai-val").className = "telem-val online";
+
+      try {
+        const res = await fetch("/api/sort", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ category, confidence })
+        });
+        const data = await res.json();
+        console.log("[Prototype Camera] Sort response received:", data);
+      } catch (err) {
+        console.error("Sorting trigger error:", err);
+      } finally {
+        setTimeout(() => {
+          isSortingActive = false;
+        }, 3000);
+      }
+    }
+
+    // Initialize on page load
+    window.addEventListener("DOMContentLoaded", () => {
+      initPrototypeCamera();
+      setInterval(captureAndSendFrame, CAPTURE_INTERVAL_MS);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+# EcoNova - Python Dependencies for Local Prototype & Render Cloud Deployment
+# Web Framework & WSGI Production Server:
+Flask>=3.0.0
+gunicorn>=21.2.0
+
+# AI Waste Detection (EcoNova Authoritative 3-Class YOLO):
+ultralytics>=8.2.0
+opencv-python-headless>=4.9.0.80
+numpy>=1.26.0
+
+# Reward System & QR Code Generation:
+qrcode[pil]>=7.4.2
+Pillow>=10.0.0
+
+# ESP32 Hardware Controller (COM6 on local Windows, software-fallback on Render):
+pyserial>=3.5
